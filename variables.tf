@@ -42,7 +42,7 @@ variable "bastion_host_key_pair" {
   description = "Select the key pair to use to launch the bastion host"
 }
 
-variable "hosted_zone_name" {
+variable "hosted_zone_id" {
   description = "Name of the hosted zone were we'll register the bastion DNS name"
   default     = ""
 }
@@ -52,9 +52,26 @@ variable "bastion_record_name" {
   default     = ""
 }
 
-variable "bastion_launch_configuration_name" {
-  description = "Bastion Launch configuration Name, will also be used for the ASG"
-  default     = "lc"
+variable "bastion_launch_template_name" {
+  description = "Bastion Launch template Name, will also be used for the ASG"
+  default     = "bastion-lt"
+}
+
+variable "bastion_security_group_id" {
+  description = "Custom security group to use"
+  default     = ""
+}
+
+variable "bastion_additional_security_groups" {
+  description = "List of additional security groups to attach to the launch template"
+  type        = list(string)
+  default     = []
+}
+
+variable "bastion_ami" {
+  type        = string
+  description = "The AMI that the Bastion Host will use."
+  default     = ""
 }
 
 variable "elb_subnets" {
@@ -76,7 +93,7 @@ variable "bastion_instance_count" {
 }
 
 variable "create_dns_record" {
-  description = "Choose if you want to create a record name for the bastion (LB). If true 'hosted_zone_name' and 'bastion_record_name' are mandatory "
+  description = "Choose if you want to create a record name for the bastion (LB). If true 'hosted_zone_id' and 'bastion_record_name' are mandatory "
 }
 
 variable "log_auto_clean" {
@@ -109,3 +126,24 @@ variable "private_ssh_port" {
   default     = 22
 }
 
+variable "extra_user_data_content" {
+  description = "Additional scripting to pass to the bastion host. For example, this can include installing postgresql for the `psql` command."
+  type        = string
+  default     = ""
+}
+
+variable "allow_ssh_commands" {
+  description = "Allows the SSH user to execute one-off commands. Pass 'True' to enable. Warning: These commands are not logged and increase the vulnerability of the system. Use at your own discretion."
+  type        = string
+  default     = ""
+}
+
+variable "bastion_iam_policy_name" {
+  description = "IAM policy name to create for granting the instance role access to the bucket"
+  default     = "BastionHost"
+}
+
+variable "instance_type" {
+  description = "Instance size of the bastion"
+  default     = "t3.nano"
+}
