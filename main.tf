@@ -309,10 +309,21 @@ resource "aws_autoscaling_group" "bastion_auto_scaling_group" {
     "OldestLaunchConfiguration",
   ]
 
-  tags = concat(
-    list(map("key", "Name", "value", "ASG-${local.name_prefix}", "propagate_at_launch", true)),
-    local.tags_asg_format
-  )
+  tag {
+    key                 = "Name"
+    value               = "ASG-${local.name_prefix}"
+    propagate_at_launch = true
+  }
+
+  dynamic "tag" {
+    for_each = local.tags_asg_format
+    content {
+      key                 = tag.value["key"]
+      value               = tag.value["value"]
+      propagate_at_launch = tag.value["propagate_at_launch"]
+    }
+  }
+
 
   lifecycle {
     create_before_destroy = true
